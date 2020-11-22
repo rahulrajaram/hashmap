@@ -117,7 +117,6 @@ void put_value_into_hashmap(void* hashmap, char* key, char* value, int should_re
     if (((HashMap*) hashmap)->largest_bucket_size < bucket_size) {
         ((HashMap*) hashmap)->largest_bucket_size = bucket_size;
         if (((HashMap*) hashmap)->largest_bucket_size > 2 && should_resize) {
-            printf("%d\n", ((HashMap*) hashmap)->largest_bucket_size);
             /*((HashMap*) hashmap)->expand(hashmap);*/
         }
     }
@@ -150,13 +149,18 @@ void delete_key_from_hashmap(void* hashmap, char* key) {
 }
 
 
-void destruct_hash_map(void* hashmap) {
-    Bucket** buckets = ((HashMap*) hashmap)->buckets;
-    unsigned int slots = ((HashMap*) hashmap)->slots;
+void _destruct_buckets(Bucket** buckets, unsigned int slots) {
     for (int i = 0; i < slots; i ++) {
         buckets[i]->destruct(buckets[i]);
     }
     free(buckets);
+}
+
+
+void destruct_hash_map(void* hashmap) {
+    Bucket** buckets = ((HashMap*) hashmap)->buckets;
+    unsigned int slots = ((HashMap*) hashmap)->slots;
+    _destruct_buckets(buckets, slots);
     free(hashmap);
 }
 
@@ -189,63 +193,45 @@ void double_hashmap_size(void* hashmap) {
     Bucket** current = ((HashMap*) hashmap)->buckets;
     int slots = ((HashMap*) hashmap)->slots;
     int i = 0;
-    printf("here: %d\n", new_hashmap->slots);
-    printf("here: %d\n", slots);
-    if(COUNT ++ > 10) {
-        exit(1);
-    }
     while (i < slots) {
         Mapping* current_mapping = (*current)->mappings;
-        int count = 0;
         while (current_mapping) {
-            new_hashmap->put(new_hashmap, current_mapping->key, current_mapping->value, 0);
+            new_hashmap->put(new_hashmap, current_mapping->key, current_mapping->value, 1);
             current_mapping = current_mapping->next;
-            if (count ++ > 10000) {
-                /*exit(1);*/
-            }
         }
         i ++;
-        (*current)++;
+        current ++;
     }
-
+    _destruct_buckets(((HashMap*) hashmap)->buckets, slots);
     ((HashMap*) hashmap)->buckets = new_hashmap->buckets;
     ((HashMap*) hashmap)->slots = new_hashmap->slots;
     ((HashMap*) hashmap)->largest_bucket_size = new_hashmap->largest_bucket_size;
+    free(new_hashmap);
 }
 
 
 void operate(HashMap* hashmap) {
-    for (int i = 0; i < 10; i ++) {
+    for (int i = 0; i < 40; i ++) {
         int length = snprintf(NULL, 0, "%d", i);
         char* str = malloc( length + 1 );
         snprintf( str, length + 1, "%d", i);
         hashmap->put(hashmap, str, "a", 1);
         free(str);
     }
-/*    hashmap->put(hashmap, "1", "a");*/
-    /*hashmap->put(hashmap, "2", "b");*/
-    /*hashmap->put(hashmap, "3", "c");*/
-    /*hashmap->put(hashmap, "4", "d");*/
-    /*hashmap->put(hashmap, "5", "e");*/
-    /*hashmap->put(hashmap, "6", "e");*/
-    /*hashmap->put(hashmap, "7", "e");*/
-    /*hashmap->put(hashmap, "8", "e");*/
-    /*hashmap->put(hashmap, "9", "e");*/
-    /*hashmap->put(hashmap, "1", "f");*/
-    /*hashmap->put(hashmap, "10", "g");*/
-    /*hashmap->put(hashmap, "11", "h");*/
-    /*hashmap->delete(hashmap, "5");*/
-    /*hashmap->delete(hashmap, "5");*/
-    /*hashmap->delete(hashmap, "10");*/
 }
 
 int main() {
     HashMap* hashmap = (HashMap*) malloc(sizeof(HashMap));
     hashmap->init = init_hashmap;
-    hashmap->init(hashmap, 3);
+    hashmap->init(hashmap, 2);
     operate(hashmap);
-    /*hashmap->print(hashmap);*/
-/*    hashmap->expand(hashmap);*/
+/*    hashmap->print(hashmap);*/
+    /*hashmap->expand(hashmap);*/
+    /*hashmap->expand(hashmap);*/
+    /*hashmap->expand(hashmap);*/
+    /*hashmap->expand(hashmap);*/
+    /*hashmap->expand(hashmap);*/
+    /*hashmap->expand(hashmap);*/
     /*hashmap->expand(hashmap);*/
     /*hashmap->expand(hashmap);*/
     /*hashmap->expand(hashmap);*/
