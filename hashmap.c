@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "jenkins_hash.h"
+
 
 typedef struct Mapping {
     char key[256];
@@ -57,13 +59,8 @@ typedef struct HashMap {
 
 
 unsigned int hashvalue(void* hashmap, char* key) {
-    int i = 0;
-    int key_sum = 0;
-    while (*key != '\0') {
-        key_sum += (int)(*key);
-        key ++;
-    }
-    unsigned int _hashvalue = (unsigned int) (key_sum % ((HashMap*) hashmap)->slots);
+    int len = strlen(key);
+    unsigned int _hashvalue = (unsigned int) (jenkins_hash(key, len) % ((HashMap*) hashmap)->slots);
 
     return _hashvalue;
 }
