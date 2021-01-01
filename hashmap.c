@@ -47,6 +47,8 @@ static Mapping* create_new_mapping(char* key, char* value) {
 typedef struct HashMap {
     int slots;
     int largest_bucket_size;
+    int max_items;
+    int items_count;
     Bucket** buckets;
     void (*init)(void*, int);
     unsigned int (*hashvalue)(void*, char*);
@@ -93,6 +95,11 @@ void put_value_into_hashmap(void* hashmap, char* key, char* value, int should_re
     Bucket* bucket = ((HashMap*) hashmap)->buckets[slot_value];
     Mapping* new_mapping = create_new_mapping(key, value);
     int bucket_size = 0;
+    if (((HashMap*) hashmap)->items_count == ((HashMap*) hashmap)->max_items) {
+        printf("hash map too large\n");
+        /*((HashMap*) hashmap)->print(hashmap);*/
+        exit(1);
+    }
     if (!bucket->mappings) {
         bucket->mappings = new_mapping;
         bucket_size += 1;
@@ -111,10 +118,11 @@ void put_value_into_hashmap(void* hashmap, char* key, char* value, int should_re
         if (prev)
             prev->next = new_mapping;
     }
+    ((HashMap*) hashmap)->items_count ++;
     if (((HashMap*) hashmap)->largest_bucket_size < bucket_size) {
         ((HashMap*) hashmap)->largest_bucket_size = bucket_size;
-        if (((HashMap*) hashmap)->largest_bucket_size > 2 && should_resize) {
-            /*((HashMap*) hashmap)->expand(hashmap);*/
+        if (((HashMap*) hashmap)->largest_bucket_size > 5 && should_resize) {
+            ((HashMap*) hashmap)->expand(hashmap);
         }
     }
 }
@@ -139,6 +147,7 @@ void delete_key_from_hashmap(void* hashmap, char* key) {
                 }
                 return;
             }
+            ((HashMap*) hashmap)->items_count --;
             prev = current;
             current = current->next;
         }
@@ -179,6 +188,8 @@ void init_hashmap(void* hashmap, int initial_slots) {
     ((HashMap*) hashmap)->expand = double_hashmap_size;
     ((HashMap*) hashmap)->destruct = destruct_hash_map;
     ((HashMap*) hashmap)->largest_bucket_size = 0;
+    ((HashMap*) hashmap)->max_items = 500000;
+    ((HashMap*) hashmap)->items_count = 0;
 }
 
 
