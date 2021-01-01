@@ -72,6 +72,7 @@ void print_hashmap_slots(void* hashmap) {
     Bucket** current = ((HashMap*) hashmap)->buckets;
     int slots = ((HashMap*) hashmap)->slots;
     int i = 0;
+    int items = 0;
     while (i < slots) {
         Mapping* current_mapping = (*current)->mappings;
         if (!current_mapping) {
@@ -83,11 +84,13 @@ void print_hashmap_slots(void* hashmap) {
         while (current_mapping) {
             printf("(%s, %s), ", current_mapping->key, current_mapping->value);
             current_mapping = current_mapping->next;
+            items ++;
         }
         printf("\n");
         i ++;
         current ++;
     }
+    printf("printed %d items\n", items);
 }
 
 
@@ -224,7 +227,7 @@ void double_hashmap_size(void* hashmap) {
 
 
 void operate(HashMap* hashmap) {
-    for (int i = 0; i < 40; i ++) {
+    for (int i = 0; i < 43872; i ++) {
         int length = snprintf(NULL, 0, "%d", i);
         char* str = malloc( length + 1 );
         snprintf( str, length + 1, "%d", i);
