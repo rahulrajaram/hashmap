@@ -3,26 +3,15 @@
 #include <string.h>
 
 #include "jenkins_hash.h"
+#include "hashmap.h"
 
 
-typedef struct Mapping {
-    char key[256];
-    char value[256];
-    void* next;
-    void (*destruct)(void*);
-} Mapping;
 void destruct_mapping(void* mapping) {
     ((Mapping*) mapping)->next = NULL;
     free(mapping);
 }
 
 
-typedef struct Bucket {
-    Mapping* mappings;
-    int size;
-    int index;
-    void (*destruct)(void*);
-} Bucket;
 void destruct_bucket(void* bucket) {
     Mapping* current = ((Bucket*) bucket)->mappings;
     while (current) {
@@ -33,6 +22,7 @@ void destruct_bucket(void* bucket) {
     free(bucket);
 }
 
+
 static Mapping* create_new_mapping(char* key, char* value) {
     Mapping* new_mapping = malloc(sizeof(Mapping));
     strcpy(new_mapping->key, key);
@@ -42,22 +32,6 @@ static Mapping* create_new_mapping(char* key, char* value) {
 
     return (void*) new_mapping;
 }
-
-
-typedef struct HashMap {
-    int slots;
-    int largest_bucket_size;
-    int max_items;
-    int items_count;
-    Bucket** buckets;
-    void (*init)(void*, int);
-    unsigned int (*hashvalue)(void*, char*);
-    void (*print)(void*);
-    void (*put)(void*, char*, char*, int);
-    void (*delete)(void*, char*);
-    void (*expand)(void*);
-    void (*destruct)(void*);
-} HashMap;
 
 
 unsigned int hashvalue(void* hashmap, char* key) {
