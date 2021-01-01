@@ -73,8 +73,13 @@ void print_hashmap_slots(void* hashmap) {
     int slots = ((HashMap*) hashmap)->slots;
     int i = 0;
     while (i < slots) {
-        printf("%d -> ", (*current)->index);
         Mapping* current_mapping = (*current)->mappings;
+        if (!current_mapping) {
+            i ++;
+            current ++;
+            continue;
+        }
+        printf("%d -> ", (*current)->index);
         while (current_mapping) {
             printf("(%s, %s), ", current_mapping->key, current_mapping->value);
             current_mapping = current_mapping->next;
