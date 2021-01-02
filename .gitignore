@@ -3,3 +3,9 @@ Makefile
 config.log
 config.status
 *.swp
+
+a.out
+*.o
+autom4te.cache/
+build-aux/
+hashmap
