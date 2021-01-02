@@ -31,6 +31,7 @@ typedef struct HashMap {
     void (*put)(void*, char*, char*, int);
     void (*delete)(void*, char*);
     void (*expand)(void*);
+    void (*shrink)(void*);
     void (*destruct)(void*);
 } HashMap;
 #endif

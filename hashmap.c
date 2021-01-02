@@ -83,6 +83,7 @@ void print_hashmap_slots(void* hashmap) {
 
 
 void double_hashmap_size(void*);
+void shrink_hashmap_size(void*);
 
 
 int COUNT = 0;
@@ -148,6 +149,17 @@ void delete_key_from_hashmap(void* hashmap, char* key) {
         }
     }
     ((HashMap*) hashmap)->items_count --;
+    int item_count = ((HashMap*) hashmap)->items_count;
+    int max_bucket_size = ((HashMap*) hashmap)->max_bucket_size;
+    int slots = ((HashMap*) hashmap)->slots;
+    int max_capacity = max_bucket_size * slots;
+    if (item_count < (int)((float) max_capacity/(float) 4)) {
+        if (((HashMap*) hashmap)->verbose) {
+            printf("Shrinking table\n");
+            printf("slots: %d\n", slots);
+        }
+        ((HashMap*) hashmap)->shrink(hashmap);
+    }
 }
 
 
@@ -189,6 +201,7 @@ void init_hashmap(
     ((HashMap*) hashmap)->put = put_value_into_hashmap;
     ((HashMap*) hashmap)->delete = delete_key_from_hashmap;
     ((HashMap*) hashmap)->expand = double_hashmap_size;
+    ((HashMap*) hashmap)->shrink = shrink_hashmap_size;
     ((HashMap*) hashmap)->destruct = destruct_hash_map;
     ((HashMap*) hashmap)->largest_bucket_size = 0;
     ((HashMap*) hashmap)->max_items = max_items;
@@ -218,6 +231,41 @@ void double_hashmap_size(void* hashmap) {
         Mapping* current_mapping = (*current)->mappings;
         while (current_mapping) {
             new_hashmap->put(new_hashmap, current_mapping->key, current_mapping->value, 1);
+            current_mapping = current_mapping->next;
+        }
+        i ++;
+        current ++;
+    }
+    _destruct_buckets(((HashMap*) hashmap)->buckets, slots);
+    ((HashMap*) hashmap)->buckets = new_hashmap->buckets;
+    ((HashMap*) hashmap)->slots = new_hashmap->slots;
+    ((HashMap*) hashmap)->largest_bucket_size = new_hashmap->largest_bucket_size;
+    free(new_hashmap);
+}
+
+
+void shrink_hashmap_size(void* hashmap) {
+    HashMap* new_hashmap = (HashMap*) malloc(sizeof(HashMap));
+    new_hashmap->init = init_hashmap;
+    new_hashmap->init(
+        new_hashmap,
+        ((HashMap*) hashmap)->slots / 2,
+        ((HashMap*) hashmap)->max_items,
+        ((HashMap*) hashmap)->max_bucket_size,
+        ((HashMap*) hashmap)->verbose,
+        ((HashMap*) hashmap)->debug
+    );
+
+    Bucket** current = ((HashMap*) hashmap)->buckets;
+    int slots = ((HashMap*) hashmap)->slots;
+    int i = 0;
+    // Prevent table expansions during contractions for smooth
+    // deletions.
+    int should_resize = 0;
+    while (i < slots) {
+        Mapping* current_mapping = (*current)->mappings;
+        while (current_mapping) {
+            new_hashmap->put(new_hashmap, current_mapping->key, current_mapping->value, should_resize);
             current_mapping = current_mapping->next;
         }
         i ++;
