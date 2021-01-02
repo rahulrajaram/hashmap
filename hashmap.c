@@ -238,18 +238,6 @@ int main(int argc, char *argv[]) {
         _arguments.max_slots
     );
     operate(hashmap, hashmap->max_items);
-/*    hashmap->print(hashmap);*/
-    /*hashmap->expand(hashmap);*/
-    /*hashmap->expand(hashmap);*/
-    /*hashmap->expand(hashmap);*/
-    /*hashmap->expand(hashmap);*/
-    /*hashmap->expand(hashmap);*/
-    /*hashmap->expand(hashmap);*/
-    /*hashmap->expand(hashmap);*/
-    /*hashmap->expand(hashmap);*/
-    /*hashmap->expand(hashmap);*/
-    /*hashmap->expand(hashmap);*/
-    /*hashmap->expand(hashmap);*/
     hashmap->print(hashmap);
     hashmap->destruct(hashmap);
 
