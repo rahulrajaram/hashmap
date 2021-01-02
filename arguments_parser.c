@@ -24,6 +24,16 @@ static struct argp_option options[] = {
         "Max number of key-value pairs that resolve to a slot. Defaults to 10"
     },
     {
+        "verbose", 'v',
+        0, 0,
+        "Produce verbose output"
+    },
+    {
+        "debug", 'd',
+        0, 0,
+        "Produce debug output"
+    },
+    {
         0
     }
 };
@@ -38,6 +48,12 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
         break;
     case 's':
         arguments->max_slots = arg ? atoi(arg) : 10;
+        break;
+    case 'v':
+        arguments->verbose = 1;
+        break;
+    case 'd':
+        arguments->debug = 1;
         break;
     case ARGP_KEY_ARG:
         return 0;
@@ -55,11 +71,13 @@ struct arguments parse_arguments(int argc, char *argv[])
 
     argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
-    printf(
-        "%d\n%d\n",
-            arguments.max_items,
-            arguments.max_slots
-    );
+    if (arguments.verbose) {
+        printf(
+            "Max items: %d\nMax bucket size: %d\n",
+                arguments.max_items,
+                arguments.max_slots
+        );
+    }
 
     return arguments;
 }

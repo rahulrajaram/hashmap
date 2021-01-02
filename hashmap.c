@@ -58,19 +58,27 @@ void print_hashmap_slots(void* hashmap) {
             empty_slots ++;
             continue;
         }
-        printf("%d -> ", (*current)->index);
+        if (((HashMap*) hashmap)->debug) {
+            printf("%d -> ", (*current)->index);
+        }
         while (current_mapping) {
-            printf("(%s, %s), ", current_mapping->key, current_mapping->value);
+            if (((HashMap*) hashmap)->debug) {
+                printf("(%s, %s), ", current_mapping->key, current_mapping->value);
+            }
             current_mapping = current_mapping->next;
             items ++;
         }
-        printf("\n");
+        if (((HashMap*) hashmap)->debug) {
+            printf("\n");
+        }
         i ++;
         current ++;
     }
-    printf("printed %d items\n", items);
-    printf("Slot vacancy: %f%\n", (((float) empty_slots)/(float) slots) * 100);
-    printf("Slot ocupancy: %f%\n", (((float) (slots - empty_slots))/(float) slots) * 100);
+    if (((HashMap*) hashmap)->verbose || ((HashMap*) hashmap)->debug) {
+        printf("Total items: %d\n", items);
+        printf("Slot vacancy: %f%\n", (((float) empty_slots)/(float) slots) * 100);
+        printf("Slot ocupancy: %f%\n", (((float) (slots - empty_slots))/(float) slots) * 100);
+    }
 }
 
 
@@ -163,7 +171,9 @@ void init_hashmap(
         void* hashmap,
         int initial_slots,
         int max_items,
-        int max_bucket_size
+        int max_bucket_size,
+        int verbose,
+        int debug
 ) {
     ((HashMap*) hashmap)->slots = initial_slots;
     ((HashMap*) hashmap)->buckets = malloc(sizeof(Bucket*) * initial_slots);
@@ -184,6 +194,8 @@ void init_hashmap(
     ((HashMap*) hashmap)->max_items = max_items;
     ((HashMap*) hashmap)->items_count = 0;
     ((HashMap*) hashmap)->max_bucket_size = max_bucket_size;
+    ((HashMap*) hashmap)->verbose = verbose;
+    ((HashMap*) hashmap)->debug = debug;
 }
 
 
@@ -194,7 +206,9 @@ void double_hashmap_size(void* hashmap) {
         new_hashmap,
         ((HashMap*) hashmap)->slots * 2,
         ((HashMap*) hashmap)->max_items,
-        ((HashMap*) hashmap)->max_bucket_size
+        ((HashMap*) hashmap)->max_bucket_size,
+        ((HashMap*) hashmap)->verbose,
+        ((HashMap*) hashmap)->debug
     );
 
     Bucket** current = ((HashMap*) hashmap)->buckets;
@@ -235,7 +249,9 @@ int main(int argc, char *argv[]) {
         hashmap,
         2,
         _arguments.max_items,
-        _arguments.max_slots
+        _arguments.max_slots,
+        _arguments.verbose,
+        _arguments.debug
     );
     operate(hashmap, hashmap->max_items);
     hashmap->print(hashmap);

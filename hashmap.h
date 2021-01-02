@@ -22,8 +22,10 @@ typedef struct HashMap {
     int max_items;
     int max_bucket_size;
     int items_count;
+    int verbose;
+    int debug;
     Bucket** buckets;
-    void (*init)(void*, int, int, int);
+    void (*init)(void*, int, int, int, int, int);
     unsigned int (*hashvalue)(void*, char*);
     void (*print)(void*);
     void (*put)(void*, char*, char*, int);
