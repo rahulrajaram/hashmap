@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <argp.h>
 
+#include "arguments_parser.h"
 #include "jenkins_hash.h"
 #include "hashmap.h"
 
@@ -210,7 +212,8 @@ void operate(HashMap* hashmap) {
     }
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    struct arguments _arguments = parse_arguments(argc, argv);
     HashMap* hashmap = (HashMap*) malloc(sizeof(HashMap));
     hashmap->init = init_hashmap;
     hashmap->init(hashmap, 2);

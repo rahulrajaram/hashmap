@@ -101,7 +101,8 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_hashmap_OBJECTS = hashmap.$(OBJEXT) jenkins_hash.$(OBJEXT)
+am_hashmap_OBJECTS = arguments_parser.$(OBJEXT) hashmap.$(OBJEXT) \
+	jenkins_hash.$(OBJEXT)
 hashmap_OBJECTS = $(am_hashmap_OBJECTS)
 hashmap_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -119,8 +120,8 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/hashmap.Po \
-	./$(DEPDIR)/jenkins_hash.Po
+am__depfiles_remade = ./$(DEPDIR)/arguments_parser.Po \
+	./$(DEPDIR)/hashmap.Po ./$(DEPDIR)/jenkins_hash.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -273,7 +274,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-hashmap_SOURCES = hashmap.c jenkins_hash.c
+hashmap_SOURCES = arguments_parser.c hashmap.c jenkins_hash.c
 all: all-am
 
 .SUFFIXES:
@@ -364,6 +365,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arguments_parser.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/hashmap.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jenkins_hash.Po@am__quote@ # am--include-marker
 
@@ -655,7 +657,8 @@ clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-		-rm -f ./$(DEPDIR)/hashmap.Po
+		-rm -f ./$(DEPDIR)/arguments_parser.Po
+	-rm -f ./$(DEPDIR)/hashmap.Po
 	-rm -f ./$(DEPDIR)/jenkins_hash.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
@@ -704,7 +707,8 @@ installcheck-am:
 maintainer-clean: maintainer-clean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -rf $(top_srcdir)/autom4te.cache
-		-rm -f ./$(DEPDIR)/hashmap.Po
+		-rm -f ./$(DEPDIR)/arguments_parser.Po
+	-rm -f ./$(DEPDIR)/hashmap.Po
 	-rm -f ./$(DEPDIR)/jenkins_hash.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic

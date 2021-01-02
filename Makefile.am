@@ -1,2 +1,2 @@
 bin_PROGRAMS = hashmap
-hashmap_SOURCES = hashmap.c jenkins_hash.c
+hashmap_SOURCES = arguments_parser.c hashmap.c jenkins_hash.c
