@@ -20,9 +20,10 @@ typedef struct HashMap {
     int slots;
     int largest_bucket_size;
     int max_items;
+    int max_bucket_size;
     int items_count;
     Bucket** buckets;
-    void (*init)(void*, int);
+    void (*init)(void*, int, int, int);
     unsigned int (*hashvalue)(void*, char*);
     void (*print)(void*);
     void (*put)(void*, char*, char*, int);

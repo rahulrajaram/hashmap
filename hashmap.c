@@ -105,7 +105,7 @@ void put_value_into_hashmap(void* hashmap, char* key, char* value, int should_re
     ((HashMap*) hashmap)->items_count ++;
     if (((HashMap*) hashmap)->largest_bucket_size < bucket_size) {
         ((HashMap*) hashmap)->largest_bucket_size = bucket_size;
-        if (((HashMap*) hashmap)->largest_bucket_size > 5 && should_resize) {
+        if (((HashMap*) hashmap)->largest_bucket_size > ((HashMap*) hashmap)->max_bucket_size && should_resize) {
             ((HashMap*) hashmap)->expand(hashmap);
         }
     }
@@ -155,7 +155,12 @@ void destruct_hash_map(void* hashmap) {
 }
 
 
-void init_hashmap(void* hashmap, int initial_slots) {
+void init_hashmap(
+        void* hashmap,
+        int initial_slots,
+        int max_items,
+        int max_bucket_size
+) {
     ((HashMap*) hashmap)->slots = initial_slots;
     ((HashMap*) hashmap)->buckets = malloc(sizeof(Bucket*) * initial_slots);
     Bucket** buckets = ((HashMap*) hashmap)->buckets;
@@ -172,15 +177,21 @@ void init_hashmap(void* hashmap, int initial_slots) {
     ((HashMap*) hashmap)->expand = double_hashmap_size;
     ((HashMap*) hashmap)->destruct = destruct_hash_map;
     ((HashMap*) hashmap)->largest_bucket_size = 0;
-    ((HashMap*) hashmap)->max_items = 500000;
+    ((HashMap*) hashmap)->max_items = max_items;
     ((HashMap*) hashmap)->items_count = 0;
+    ((HashMap*) hashmap)->max_bucket_size = max_bucket_size;
 }
 
 
 void double_hashmap_size(void* hashmap) {
     HashMap* new_hashmap = (HashMap*) malloc(sizeof(HashMap));
     new_hashmap->init = init_hashmap;
-    new_hashmap->init(new_hashmap, ((HashMap*) hashmap)->slots * 2);
+    new_hashmap->init(
+        new_hashmap,
+        ((HashMap*) hashmap)->slots * 2,
+        ((HashMap*) hashmap)->max_items,
+        ((HashMap*) hashmap)->max_bucket_size
+    );
 
     Bucket** current = ((HashMap*) hashmap)->buckets;
     int slots = ((HashMap*) hashmap)->slots;
@@ -202,8 +213,8 @@ void double_hashmap_size(void* hashmap) {
 }
 
 
-void operate(HashMap* hashmap) {
-    for (int i = 0; i < 43872; i ++) {
+void operate(HashMap* hashmap, int max_items) {
+    for (int i = 0; i < max_items; i ++) {
         int length = snprintf(NULL, 0, "%d", i);
         char* str = malloc( length + 1 );
         snprintf( str, length + 1, "%d", i);
@@ -216,8 +227,13 @@ int main(int argc, char *argv[]) {
     struct arguments _arguments = parse_arguments(argc, argv);
     HashMap* hashmap = (HashMap*) malloc(sizeof(HashMap));
     hashmap->init = init_hashmap;
-    hashmap->init(hashmap, 2);
-    operate(hashmap);
+    hashmap->init(
+        hashmap,
+        2,
+        _arguments.max_items,
+        _arguments.max_slots
+    );
+    operate(hashmap, hashmap->max_items);
 /*    hashmap->print(hashmap);*/
     /*hashmap->expand(hashmap);*/
     /*hashmap->expand(hashmap);*/
