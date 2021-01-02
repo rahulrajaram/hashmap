@@ -287,6 +287,14 @@ void operate(HashMap* hashmap, int max_items) {
         hashmap->put(hashmap, str, "a", 1);
         free(str);
     }
+    for (int i = 0; i < max_items / 2; i ++) {
+        int length = snprintf(NULL, 0, "%d", i);
+        char* str = malloc( length + 1 );
+        snprintf( str, length + 1, "%d", i);
+        hashmap->delete(hashmap, str);
+        free(str);
+    }
+
 }
 
 int main(int argc, char *argv[]) {
