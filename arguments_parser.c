@@ -68,6 +68,8 @@ static struct argp argp = { options, parse_opt, args_doc, doc, 0, 0, 0 };
 struct arguments parse_arguments(int argc, char *argv[])
 {
     struct arguments arguments;
+    arguments.debug = 0;
+    arguments.verbose = 0;
 
     argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
