@@ -126,28 +126,28 @@ void put_value_into_hashmap(void* hashmap, char* key, char* value, int should_re
 
 void delete_key_from_hashmap(void* hashmap, char* key) {
     unsigned int slot_value = ((HashMap*) hashmap)->hashvalue(hashmap, key);
-    Bucket** bucket = ((HashMap*) hashmap)->buckets;
-    if ((*bucket)->mappings) {
-        // raise error
+    Bucket* bucket = ((HashMap*) hashmap)->buckets[slot_value];
+    if (!bucket->mappings) {
+        printf("Couldn't find key");
         return; 
     } else {
-        Mapping* current = (*bucket)->mappings;
+        Mapping* current = bucket->mappings;
         Mapping* prev = NULL;
         while (current) {
             if (strcmp(current->key, key) == 0) {
                 if (prev) {
                     prev->next = current->next;
-                    free(current);
                 } else {
-                    (*bucket)->mappings = current->next;
+                    bucket->mappings = current->next;
                 }
-                return;
+                free(current);
+                break;
             }
-            ((HashMap*) hashmap)->items_count --;
             prev = current;
             current = current->next;
         }
     }
+    ((HashMap*) hashmap)->items_count --;
 }
 
 
