@@ -49,11 +49,13 @@ void print_hashmap_slots(void* hashmap) {
     int slots = ((HashMap*) hashmap)->slots;
     int i = 0;
     int items = 0;
+    int empty_slots = 0;
     while (i < slots) {
         Mapping* current_mapping = (*current)->mappings;
         if (!current_mapping) {
             i ++;
             current ++;
+            empty_slots ++;
             continue;
         }
         printf("%d -> ", (*current)->index);
@@ -67,6 +69,8 @@ void print_hashmap_slots(void* hashmap) {
         current ++;
     }
     printf("printed %d items\n", items);
+    printf("Slot vacancy: %f%\n", (((float) empty_slots)/(float) slots) * 100);
+    printf("Slot ocupancy: %f%\n", (((float) (slots - empty_slots))/(float) slots) * 100);
 }
 
 
